@@ -4,91 +4,77 @@
    tasks:
     - name: update all packages
       yum:
-         name: '*'
-         state: latest
+        name: '*'
+        state: latest
+
     - name: install apache
       yum: 
-         name: httpd
-         state: installed
-      notify:
-       - start apache
-       - enable apache
+        name: httpd
+        state: installed
+    - name: start apache
+      service: 
+        name: httpd
+        state: started 
+    - name: enable apache
+      service: 
+        name: httpd
+        enabled: yes 
+
     - name: Install php
       yum:
-         name: 
-          - php  
-         state: installed
-      notify:
-       - start php
-       - enable php      
+        name: php  
+        state: installed
+    - name: start php
+      service: 
+        name: php-fpm
+        state: started 
+    - name: enable php
+      service: 
+        name: php-fpm
+        enabled: yes 
+    
     - name: install mysql
       yum: 
-         name: 
-          - mysql
-          - mysql-libs
-         state: installed 
-      notify:
-       - start mysql
-       - enable mysql   
-    - name: install python-firewall
-      yum: 
-         name: 
-          - python-firewall
-         state: installed 
-      notify:
-       - start enable python-firewall   
+        name: 
+        - mariadb-server
+        state: installed 
+    - name: start mysql
+      service: 
+        name: mariadb
+        state: started 
+    - name: enable mysql
+      service: 
+        name: mariadb
+        enabled: yes 
+    - name: copy file php
+      copy:
+       src: /Users/salmaelmoataz/Documents/provisioner/phpscript.php
+       dest: /var/www/html
+
     - name: install firewall
       yum: 
-         name: 
-          - firewalld
-         state: latest
-      notify:
-       - start enable firewall
+        name: firewalld
+        state: installed 
+    - name: start firewalld
+      service:
+        name: firewalld
+        state: started
+    - name: enable firewalld
+      service:
+        name: firewalld
+        enabled: yes
+
     - name: enable 80
-      ansible.posix.firewalld:
-         port: 80/tcp
-         permanent: yes
-         state: enabled 
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+    - name: enable 443
+      firewalld:
+        port: 443/tcp
+        permanent: yes
+        state: enabled
 
+        
 
-
-   handlers:
-      - name: start apache
-        service: 
-         name: httpd
-         state: started 
-      - name: enable httpd
-        service: 
-         name: httpd
-         enabled: yes   
-
-      - name: start php
-        service: 
-         name: php
-         state: started 
-      - name: enable php
-        service: 
-         name: php
-         enabled: yes 
-
-
-      - name: start mysql
-        service: 
-         name: mysql
-         state: started 
-      - name: enable mysql
-        service: 
-         name: mysql
-         enabled: yes 
-
-      - name: start enable python-firewall
-        service:
-         name: python-firewall
-         state: started
-         enabled: yes   
-
-      - name: start enable firewall
-        service:
-         name: firewalld
-         state: started
-         enabled: yes
+      
